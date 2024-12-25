@@ -1,59 +1,35 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { use, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { currentMonitor } from '@tauri-apps/api/window';
 import "./App.css";
 
+const monitor = currentMonitor();
+
 function App() {
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
 
-  async function logMyRust() {
+  async function move_mouse(x=0, y=0, abs=false) {
     try {
-      setGreetMsg(await invoke("move_mouse", { x: 100, y: 100, abs: true }));
+      setGreetMsg(await invoke("move_mouse", { x, y, abs}));
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect( () => {
+    (async function() {
+      const theWindow = await monitor;
+      console.log(theWindow.size.height, theWindow.size.width);
+      setScreenSize(theWindow.size);
+    })();
+  }, []);
 
   return (
-    <main className="container">
+    <div className="container">
       <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-      <button onClick={logMyRust}>Move my mouse</button>
-    </main>
+    </div>
   );
 }
 
