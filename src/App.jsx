@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { currentMonitor } from '@tauri-apps/api/window';
+import { register } from '@tauri-apps/plugin-global-shortcut';
 import "./App.css";
 
 const monitor = currentMonitor();
@@ -26,6 +27,11 @@ function App() {
 
   useEffect( () => {
     (async function() {
+      await register('CommandOrControl+Shift+Space', async () => {
+        console.log('Shortcut triggered');
+        await invoke("show_window");
+      });
+
       const theWindow = await monitor;
       console.log(theWindow);
       setScreenSize(theWindow.size);
