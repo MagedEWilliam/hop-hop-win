@@ -7,6 +7,14 @@ function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
 
+  async function logMyRust() {
+    try {
+      setGreetMsg(await invoke("move_mouse", { x: 100, y: 100, abs: true }));
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     setGreetMsg(await invoke("greet", { name }));
@@ -44,6 +52,7 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+      <button onClick={logMyRust}>Move my mouse</button>
     </main>
   );
 }
