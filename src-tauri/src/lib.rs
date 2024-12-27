@@ -32,7 +32,7 @@ fn mouse_click() -> Result<(), String> {
 
     // Perform the mouse click
     enigo
-        .button(Button::Left, Click)
+        .button(Button::Right, Click)
         .map_err(|e| format!("Failed to perform mouse click: {:?}", e))?;
 
     Ok(())
