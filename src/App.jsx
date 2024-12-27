@@ -7,7 +7,17 @@ import {
 	LogicalSize,
 } from "@tauri-apps/api/window";
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
+import { enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import "./App.css";
+
+if (import.meta.env.PROD) {
+	if ((await isEnabled()) === false) {
+		// Enable autostart
+		await enable();
+	}
+	// Check enable state
+	console.log(`registered for autostart? ${await isEnabled()}`);
+}
 
 async function mouse_click() {
 	try {
@@ -106,6 +116,7 @@ function Cells() {
 									true,
 								);
 								mouse_click(); // Trigger mouse click
+								resetHighlight(); // Reset highlights
 							}, 100); // Ensure the app is fully hidden before clicking
 						}
 						window.removeEventListener("keydown", handleSpacePress);

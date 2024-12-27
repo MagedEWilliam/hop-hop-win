@@ -1,5 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
+use tauri_plugin_autostart::MacosLauncher;
+
 #[tauri::command]
 fn move_mouse(x: i32, y: i32, abs: bool) -> Result<(), String> {
     use enigo::{Coordinate, Enigo, Mouse, Settings};
@@ -22,14 +24,11 @@ fn move_mouse(x: i32, y: i32, abs: bool) -> Result<(), String> {
 
 #[tauri::command]
 fn mouse_click() -> Result<(), String> {
-    use enigo::{
-        Button,
-        Direction::{Click},
-        Enigo, Mouse, Settings,
-    };
+    use enigo::{Button, Direction::Click, Enigo, Mouse, Settings};
 
     // Initialize Enigo
-    let mut enigo = Enigo::new(&Settings::default()).map_err(|e| format!("Failed to initialize Enigo: {:?}", e))?;
+    let mut enigo = Enigo::new(&Settings::default())
+        .map_err(|e| format!("Failed to initialize Enigo: {:?}", e))?;
 
     // Perform the mouse click
     enigo
@@ -59,9 +58,15 @@ fn show_window(window: tauri::Window) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"]) /* arbitrary number of args to pass to your app */))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![show_window,hide_window, move_mouse, mouse_click])
+        .invoke_handler(tauri::generate_handler![
+            show_window,
+            hide_window,
+            move_mouse,
+            mouse_click
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
