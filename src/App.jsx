@@ -68,7 +68,7 @@ function Cells() {
 		hideWindow(); // Hides the app
 	};
 
-	const handleKeyDown = (event) => {
+	const handleKeyDown = async (event) => {
 		const key = event.key.toUpperCase();
 		console.log(key);
 		const scaleFactor = window.devicePixelRatio;
@@ -102,6 +102,9 @@ function Cells() {
 					mouse_click(); // Trigger mouse click
 				}, 100);
 			}
+		} else if (key === "ESCAPE") {
+			await invoke("hide_window");
+			resetHighlight(); // Reset highlights
 		} else if (key === "TAB") {
 			const activeCell = document.querySelector(".active");
 			if (activeCell) {
