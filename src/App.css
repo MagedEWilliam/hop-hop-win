@@ -20,7 +20,7 @@ body {
 }
 
 p {
-	font-size: 1rem;
+	font-size: 1.1rem;
 	color: white;
 	margin: 0px;
 }
@@ -45,4 +45,12 @@ p {
 	flex-direction: row;
 	justify-content: space-around;
 	align-items: center;
+}
+
+.highlighted {
+	background-color: rgba(255, 255, 0, 0.2);
+}
+
+.active {
+	background-color: rgba(0, 255, 0, 0.2); /* Highlight for the cell */
 }

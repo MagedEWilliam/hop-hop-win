@@ -9,30 +9,14 @@ import {
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import "./App.css";
 
-function Cell({ index, cell }) {
-	return (
-		<div
-			key={index}
-			style={{
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-				border: "1px solid #ccc",
-				fontSize: "12px",
-				boxSizing: "border-box",
-			}}
-		>
-			<p>{cell}</p>
-		</div>
-	);
-}
-
 function Cells() {
-	const gridSize = 26; // 28x28 grid
+	const gridSize = 26; // 26x26 grid
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+	const [firstLetter, setFirstLetter] = useState(null);
+	const [secondLetter, setSecondLetter] = useState(null);
+
 	const letterPairs = [];
-	// Generate pairs of letters for each cell
 	for (let i = 0; i < gridSize; i++) {
 		for (let j = 0; j < gridSize; j++) {
 			const pair = alphabet.charAt(i) + alphabet.charAt(j);
@@ -40,16 +24,58 @@ function Cells() {
 		}
 	}
 
+	const resetHighlight = () => {
+		setFirstLetter(null);
+		setSecondLetter(null);
+	};
+
+	const handleKeyDown = (event) => {
+		const key = event.key.toUpperCase();
+		console.log(key);
+		if (alphabet.includes(key)) {
+			if (!firstLetter) {
+				setFirstLetter(key);
+			} else if (!secondLetter) {
+				setSecondLetter(key);
+				setTimeout(resetHighlight, 300); // Reset highlights after 1 second
+			}
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [firstLetter, secondLetter]);
+
 	return (
-		<div className="grid-container">
-			{letterPairs.map((pair, index) => (
-				<div key={index} className="grid-item">
-					<div className="cordinates">
-						<p className="left">{pair[0]}</p>
-						<p className="right">{pair[1]}</p>
+		<div
+			className="grid-container"
+			onClick={resetHighlight} // Clicking anywhere resets highlights
+		>
+			{letterPairs.map((pair, index) => {
+				const isRowHighlighted = firstLetter === pair[0];
+				const isCellHighlighted =
+					firstLetter === pair[0] && secondLetter === pair[1];
+
+				return (
+					<div
+						key={index}
+						className={`grid-item ${isCellHighlighted ? "active" : ""}`}
+					>
+						<div className="cordinates">
+							<p
+								className={`${secondLetter === null && isRowHighlighted ? "highlighted" : ""}`}
+							>
+								{pair[0]}
+							</p>
+							<p>{pair[1]}</p>
+						</div>
 					</div>
-				</div>
-			))}
+				);
+			})}
 		</div>
 	);
 }
