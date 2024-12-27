@@ -9,6 +9,14 @@ import {
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import "./App.css";
 
+async function mouse_click() {
+	try {
+		await invoke("mouse_click");
+	} catch (e) {
+		console.log(e);
+	}
+}
+
 async function move_mouse(x = 0, y = 0, abs = false) {
 	try {
 		await invoke("move_mouse", { x, y, abs });
@@ -41,7 +49,6 @@ function Cells() {
 	}
 
 	const resetHighlight = () => {
-		// Reset highlights when the user clicks anywhere
 		const activeCell = document.querySelector(".active");
 		if (activeCell) {
 			const activeCellBoundry = activeCell.getBoundingClientRect();
@@ -49,15 +56,16 @@ function Cells() {
 				activeCellBoundry.left + activeCellBoundry.width / 2;
 			const activeCellCenterY =
 				activeCellBoundry.top + activeCellBoundry.height / 2;
+
 			move_mouse(
 				parseInt(activeCellCenterX),
 				parseInt(activeCellCenterY),
 				true,
 			);
 		}
-		move_mouse();
 		setFirstLetter(null);
 		setSecondLetter(null);
+		hideWindow(); // Hides the app
 	};
 
 	const handleKeyDown = (event) => {
@@ -75,11 +83,47 @@ function Cells() {
 				setFirstLetter(key); // Set the first letter
 			} else if (!secondLetter) {
 				setSecondLetter(key); // Set the second letter
-				setTimeout(resetHighlight, 300); // Reset highlights after a timeout
+				let clicked = false;
+
+				// Listen for space key within 300ms
+				const handleSpacePress = (e) => {
+					if (e.key === " ") {
+						clicked = true;
+						const activeCell = document.querySelector(".active");
+						if (activeCell) {
+							const activeCellBoundry = activeCell.getBoundingClientRect();
+							const activeCellCenterX =
+								activeCellBoundry.left + activeCellBoundry.width / 2;
+							const activeCellCenterY =
+								activeCellBoundry.top + activeCellBoundry.height / 2;
+
+							hideWindow(); // Hide the app
+							setTimeout(() => {
+								// After hiding the app, perform the click
+								move_mouse(
+									parseInt(activeCellCenterX),
+									parseInt(activeCellCenterY),
+									true,
+								);
+								mouse_click(); // Trigger mouse click
+							}, 100); // Ensure the app is fully hidden before clicking
+						}
+						window.removeEventListener("keydown", handleSpacePress);
+					}
+				};
+
+				window.addEventListener("keydown", handleSpacePress);
+
+				// Wait for 300ms before executing resetHighlight
+				setTimeout(() => {
+					window.removeEventListener("keydown", handleSpacePress);
+					if (!clicked) {
+						resetHighlight(); // If no space key was pressed, just move the mouse
+					}
+				}, 300);
 			}
 		}
 	};
-
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
 
@@ -134,17 +178,17 @@ function App() {
 		getWindow();
 
 		async function registerShortcuts() {
-			await register("CommandOrControl+Shift+Alt+Tab", async () => {
+			await register("CommandOrControl+Alt+Space", async () => {
 				console.log("Shortcut triggered");
 				await invoke("show_window");
 			});
 		}
 
 		function unregisterAll() {
-			unregister("CommandOrControl+Shift+Alt+Tab");
+			unregister("CommandOrControl+Alt+Space");
 		}
 
-		// registerShortcuts();
+		registerShortcuts();
 
 		return () => {
 			unregisterAll();

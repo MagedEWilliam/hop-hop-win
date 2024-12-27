@@ -21,6 +21,25 @@ fn move_mouse(x: i32, y: i32, abs: bool) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn mouse_click() -> Result<(), String> {
+    use enigo::{
+        Button,
+        Direction::{Click},
+        Enigo, Mouse, Settings,
+    };
+
+    // Initialize Enigo
+    let mut enigo = Enigo::new(&Settings::default()).map_err(|e| format!("Failed to initialize Enigo: {:?}", e))?;
+
+    // Perform the mouse click
+    enigo
+        .button(Button::Left, Click)
+        .map_err(|e| format!("Failed to perform mouse click: {:?}", e))?;
+
+    Ok(())
+}
+
+#[tauri::command]
 fn hide_window(window: tauri::Window) {
     if let Err(e) = window.hide() {
         eprintln!("Failed to hide window: {:?}", e);
@@ -30,7 +49,10 @@ fn hide_window(window: tauri::Window) {
 #[tauri::command]
 fn show_window(window: tauri::Window) {
     if let Err(e) = window.show() {
-        eprintln!("Failed to hide window: {:?}", e);
+        eprintln!("Failed to show window: {:?}", e);
+    }
+    if let Err(e) = window.set_focus() {
+        eprintln!("Failed to focus window: {:?}", e);
     }
 }
 
@@ -39,7 +61,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![show_window,hide_window, move_mouse])
+        .invoke_handler(tauri::generate_handler![show_window,hide_window, move_mouse, mouse_click])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
