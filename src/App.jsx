@@ -10,14 +10,18 @@ import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import { enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import "./App.css";
 
-if (import.meta.env.PROD) {
-	if ((await isEnabled()) === false) {
-		// Enable autostart
-		await enable();
+async function checkAutostart() {
+	if (import.meta.env.PROD) {
+		if ((await isEnabled()) === false) {
+			// Enable autostart
+			await enable();
+		}
+		// Check enable state
+		console.log(`registered for autostart? ${await isEnabled()}`);
 	}
-	// Check enable state
-	console.log(`registered for autostart? ${await isEnabled()}`);
 }
+
+// checkAutostart();
 
 async function mouse_click() {
 	try {
@@ -27,7 +31,7 @@ async function mouse_click() {
 	}
 }
 
-async function move_mouse(x = 0, y = 0, abs = false) {
+async function move_mouse(x = 0, y = 0, abs = true) {
 	try {
 		await invoke("move_mouse", { x, y, abs });
 	} catch (e) {
@@ -59,20 +63,6 @@ function Cells() {
 	}
 
 	const resetHighlight = () => {
-		const activeCell = document.querySelector(".active");
-		if (activeCell) {
-			const activeCellBoundry = activeCell.getBoundingClientRect();
-			const activeCellCenterX =
-				activeCellBoundry.left + activeCellBoundry.width / 2;
-			const activeCellCenterY =
-				activeCellBoundry.top + activeCellBoundry.height / 2;
-
-			move_mouse(
-				parseInt(activeCellCenterX),
-				parseInt(activeCellCenterY),
-				true,
-			);
-		}
 		setFirstLetter(null);
 		setSecondLetter(null);
 		hideWindow(); // Hides the app
@@ -81,60 +71,64 @@ function Cells() {
 	const handleKeyDown = (event) => {
 		const key = event.key.toUpperCase();
 		console.log(key);
+		const scaleFactor = window.devicePixelRatio;
 
 		if (key === "BACKSPACE") {
 			if (secondLetter) {
 				setSecondLetter(null); // Clear the second letter
 			} else if (firstLetter) {
 				setFirstLetter(null); // Clear the first letter
+			} else if (firstLetter === null && secondLetter === null) {
+				resetHighlight(); // Reset highlights
+				hideWindow(); // Hide the app if no letters are set
+			}
+		} else if (key === " " || key === "ENTER") {
+			// Perform the click action
+			const activeCell = document.querySelector(".active");
+			if (activeCell) {
+				const activeCellBoundry = activeCell.getBoundingClientRect();
+				const activeCellCenterX =
+					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
+				const activeCellCenterY =
+					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
+
+				move_mouse(
+					Number.parseInt(activeCellCenterX),
+					Number.parseInt(activeCellCenterY),
+				);
+				resetHighlight(); // Reset highlights
+				hideWindow(); // Hide the app
+				setTimeout(() => {
+					mouse_click(); // Trigger mouse click
+				}, 100);
+			}
+		} else if (key === "TAB") {
+			const activeCell = document.querySelector(".active");
+			if (activeCell) {
+				const activeCellBoundry = activeCell.getBoundingClientRect();
+				const activeCellCenterX =
+					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
+				const activeCellCenterY =
+					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
+
+				move_mouse(
+					Number.parseInt(activeCellCenterX),
+					Number.parseInt(activeCellCenterY),
+				);
+				hideWindow(); // Hide the app
+				setTimeout(() => {
+					resetHighlight(); // Reset highlights
+				}, 100);
 			}
 		} else if (alphabet.includes(key)) {
 			if (!firstLetter) {
 				setFirstLetter(key); // Set the first letter
 			} else if (!secondLetter) {
 				setSecondLetter(key); // Set the second letter
-				let clicked = false;
-
-				// Listen for space key within 300ms
-				const handleSpacePress = (e) => {
-					if (e.key === " ") {
-						clicked = true;
-						const activeCell = document.querySelector(".active");
-						if (activeCell) {
-							const activeCellBoundry = activeCell.getBoundingClientRect();
-							const activeCellCenterX =
-								activeCellBoundry.left + activeCellBoundry.width / 2;
-							const activeCellCenterY =
-								activeCellBoundry.top + activeCellBoundry.height / 2;
-
-							hideWindow(); // Hide the app
-							setTimeout(() => {
-								// After hiding the app, perform the click
-								move_mouse(
-									parseInt(activeCellCenterX),
-									parseInt(activeCellCenterY),
-									true,
-								);
-								mouse_click(); // Trigger mouse click
-								resetHighlight(); // Reset highlights
-							}, 100); // Ensure the app is fully hidden before clicking
-						}
-						window.removeEventListener("keydown", handleSpacePress);
-					}
-				};
-
-				window.addEventListener("keydown", handleSpacePress);
-
-				// Wait for 300ms before executing resetHighlight
-				setTimeout(() => {
-					window.removeEventListener("keydown", handleSpacePress);
-					if (!clicked) {
-						resetHighlight(); // If no space key was pressed, just move the mouse
-					}
-				}, 300);
 			}
 		}
 	};
+
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
 
@@ -146,17 +140,26 @@ function Cells() {
 	return (
 		<div
 			className="grid-container"
-			onClick={resetHighlight} // Clicking anywhere resets highlights
+			onClick={() => resetHighlight()} // Clicking anywhere resets highlights
 		>
 			{letterPairs.map((pair, index) => {
 				const isRowHighlighted = firstLetter === pair[0];
 				const isCellHighlighted =
 					firstLetter === pair[0] && secondLetter === pair[1];
+				const isUnfocused = firstLetter && !isRowHighlighted; // Unfocused if the cell's row is not highlighted
 
 				return (
 					<div
-						key={index}
-						className={`grid-item ${isCellHighlighted ? "active" : isRowHighlighted ? "highlighted" : ""}`}
+						key={pair}
+						className={`grid-item ${
+							isCellHighlighted
+								? "active"
+								: isRowHighlighted
+									? "highlighted"
+									: isUnfocused
+										? "unfocused"
+										: ""
+						}`}
 					>
 						<div className="cordinates">
 							<p>{pair[0]}</p>
@@ -172,7 +175,21 @@ function Cells() {
 function App() {
 	const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
 
+	const setTrueViewportDimensions = () => {
+		const root = document.documentElement;
+
+		// Get the screen's real size in CSS pixels
+		const trueViewportWidth = window.screen.width;
+		const trueViewportHeight = window.screen.height;
+
+		console.log(trueViewportWidth, trueViewportHeight);
+		// Update the CSS variables
+		root.style.setProperty("--true-viewport-width", `${trueViewportWidth}px`);
+		root.style.setProperty("--true-viewport-height", `${trueViewportHeight}px`);
+	};
+
 	useEffect(() => {
+		setTrueViewportDimensions();
 		async function getWindow() {
 			const monitor = currentMonitor();
 			const theWindow = await monitor;

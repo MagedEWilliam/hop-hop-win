@@ -1,3 +1,11 @@
+:root {
+	--true-viewport-width: 100vw; /* Fallback */
+	--true-viewport-height: 100vh; /* Fallback */
+	--grid-size: 26; /* Default grid size */
+	--cell-width: calc(var(--true-viewport-width) / var(--grid-size));
+	--cell-height: calc(var(--true-viewport-height) / var(--grid-size));
+}
+
 html,
 body {
 	margin: 0;
@@ -27,14 +35,21 @@ p {
 
 .grid-container {
 	display: grid;
-	grid-template-columns: repeat(26, calc(100vw / 26));
-	grid-template-rows: repeat(26, calc(100vh / 26));
+	grid-template-columns: repeat(var(--grid-size), var(--cell-width));
+	grid-template-rows: repeat(var(--grid-size), var(--cell-height));
+	width: var(--true-viewport-width);
+	height: var(--true-viewport-height);
 }
 
 .grid-item {
 	position: relative;
-	border: 1px solid #ddd;
+	border: 1px solid rgba(250, 250, 250, 0.8);
 	box-sizing: border-box;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.grid-item.unfocused {
+	opacity: 0.5;
 }
 
 .cordinates {
@@ -45,10 +60,6 @@ p {
 	flex-direction: row;
 	justify-content: space-around;
 	align-items: center;
-}
-
-.highlighted {
-	background-color: rgba(255, 255, 0, 0.2);
 }
 
 .active {
