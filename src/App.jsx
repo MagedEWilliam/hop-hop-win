@@ -9,6 +9,22 @@ import {
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import "./App.css";
 
+async function move_mouse(x = 0, y = 0, abs = false) {
+	try {
+		await invoke("move_mouse", { x, y, abs });
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+async function hideWindow() {
+	try {
+		await invoke("hide_window");
+	} catch (e) {
+		console.log(e);
+	}
+}
+
 function Cells() {
 	const gridSize = 26; // 26x26 grid
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -25,6 +41,21 @@ function Cells() {
 	}
 
 	const resetHighlight = () => {
+		// Reset highlights when the user clicks anywhere
+		const activeCell = document.querySelector(".active");
+		if (activeCell) {
+			const activeCellBoundry = activeCell.getBoundingClientRect();
+			const activeCellCenterX =
+				activeCellBoundry.left + activeCellBoundry.width / 2;
+			const activeCellCenterY =
+				activeCellBoundry.top + activeCellBoundry.height / 2;
+			move_mouse(
+				parseInt(activeCellCenterX),
+				parseInt(activeCellCenterY),
+				true,
+			);
+		}
+		move_mouse();
 		setFirstLetter(null);
 		setSecondLetter(null);
 	};
@@ -32,12 +63,19 @@ function Cells() {
 	const handleKeyDown = (event) => {
 		const key = event.key.toUpperCase();
 		console.log(key);
-		if (alphabet.includes(key)) {
+
+		if (key === "BACKSPACE") {
+			if (secondLetter) {
+				setSecondLetter(null); // Clear the second letter
+			} else if (firstLetter) {
+				setFirstLetter(null); // Clear the first letter
+			}
+		} else if (alphabet.includes(key)) {
 			if (!firstLetter) {
-				setFirstLetter(key);
+				setFirstLetter(key); // Set the first letter
 			} else if (!secondLetter) {
-				setSecondLetter(key);
-				setTimeout(resetHighlight, 300); // Reset highlights after 1 second
+				setSecondLetter(key); // Set the second letter
+				setTimeout(resetHighlight, 300); // Reset highlights after a timeout
 			}
 		}
 	};
@@ -63,14 +101,10 @@ function Cells() {
 				return (
 					<div
 						key={index}
-						className={`grid-item ${isCellHighlighted ? "active" : ""}`}
+						className={`grid-item ${isCellHighlighted ? "active" : isRowHighlighted ? "highlighted" : ""}`}
 					>
 						<div className="cordinates">
-							<p
-								className={`${secondLetter === null && isRowHighlighted ? "highlighted" : ""}`}
-							>
-								{pair[0]}
-							</p>
+							<p>{pair[0]}</p>
 							<p>{pair[1]}</p>
 						</div>
 					</div>
@@ -82,22 +116,6 @@ function Cells() {
 
 function App() {
 	const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
-
-	async function move_mouse(x = 0, y = 0, abs = false) {
-		try {
-			setGreetMsg(await invoke("move_mouse", { x, y, abs }));
-		} catch (e) {
-			console.log(e);
-		}
-	}
-
-	async function hideWindow() {
-		try {
-			await invoke("hide_window");
-		} catch (e) {
-			console.log(e);
-		}
-	}
 
 	useEffect(() => {
 		async function getWindow() {
