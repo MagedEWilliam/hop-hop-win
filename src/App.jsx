@@ -255,8 +255,12 @@ function App() {
 
 		async function registerShortcuts() {
 			await register("Command+Control+Alt+Tab", async () => {
-				console.log("Shortcut triggered");
-				await invoke("show_window");
+				console.log("Shortcut triggered", await invoke("is_window_hidden"));
+				if (await invoke("is_window_hidden")) {
+					await invoke("show_window");
+				} else {
+					await invoke("hide_window");
+				}
 			});
 		}
 
