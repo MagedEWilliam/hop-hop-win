@@ -53,6 +53,7 @@ function Cells() {
 
 	const [firstLetter, setFirstLetter] = useState(null);
 	const [secondLetter, setSecondLetter] = useState(null);
+	const [selectedSubcell, setSelectedSubcell] = useState(null);
 
 	const letterPairs = [];
 	for (let i = 0; i < gridSize; i++) {
@@ -65,6 +66,7 @@ function Cells() {
 	const resetHighlight = () => {
 		setFirstLetter(null);
 		setSecondLetter(null);
+		setSelectedSubcell(null);
 		hideWindow(); // Hides the app
 	};
 
@@ -81,12 +83,31 @@ function Cells() {
 			} else if (firstLetter === null && secondLetter === null) {
 				resetHighlight(); // Reset highlights
 				hideWindow(); // Hide the app if no letters are set
+			} else if (selectedSubcell) {
+				setSelectedSubcell(null); // Clear the selected subcell
 			}
 		} else if (key === " " || key === "ENTER") {
 			// Perform the click action
 			const activeCell = document.querySelector(".active");
-			if (activeCell) {
+			if (activeCell && !selectedSubcell) {
 				const activeCellBoundry = activeCell.getBoundingClientRect();
+				const activeCellCenterX =
+					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
+				const activeCellCenterY =
+					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
+
+				move_mouse(
+					Number.parseInt(activeCellCenterX),
+					Number.parseInt(activeCellCenterY),
+				);
+				resetHighlight(); // Reset highlights
+				hideWindow(); // Hide the app
+				setTimeout(() => {
+					mouse_click(); // Trigger mouse click
+				}, 100);
+			} else if (activeCell && selectedSubcell) {
+				const activeSubCell = document.querySelector(".active-subcell");
+				const activeCellBoundry = activeSubCell.getBoundingClientRect();
 				const activeCellCenterX =
 					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
 				const activeCellCenterY =
@@ -128,17 +149,34 @@ function Cells() {
 				setFirstLetter(key); // Set the first letter
 			} else if (!secondLetter) {
 				setSecondLetter(key); // Set the second letter
+			} else if (!selectedSubcell) {
+				setSelectedSubcell(key);
 			}
 		}
 	};
 
 	useEffect(() => {
 		window.addEventListener("keydown", handleKeyDown);
+		console.log(firstLetter, secondLetter, selectedSubcell);
 
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [firstLetter, secondLetter]);
+	}, [firstLetter, secondLetter, selectedSubcell]);
+
+	const renderSubgrid = (cell) => (
+		<div className="subgrid">
+			{["w", "f", "p", "s", "r", "t", "x", "c", "d"].map((_, idx) => (
+				<div
+					key={idx}
+					className={`subcell ${selectedSubcell === _.toUpperCase() ? "active-subcell" : ""}`}
+					onClick={() => setSelectedSubcell(idx)}
+				>
+					{_.toUpperCase()}
+				</div>
+			))}
+		</div>
+	);
 
 	return (
 		<div
@@ -165,8 +203,14 @@ function Cells() {
 						}`}
 					>
 						<div className="cordinates">
-							<p>{pair[0]}</p>
-							<p>{pair[1]}</p>
+							{isCellHighlighted ? (
+								renderSubgrid(pair[0])
+							) : (
+								<>
+									<p>{pair[0]}</p>
+									<p>{pair[1]}</p>
+								</>
+							)}
 						</div>
 					</div>
 				);
@@ -209,14 +253,14 @@ function App() {
 		getWindow();
 
 		async function registerShortcuts() {
-			await register("CommandOrControl+Alt+Space", async () => {
+			await register("Command+Control+Alt+Tab", async () => {
 				console.log("Shortcut triggered");
 				await invoke("show_window");
 			});
 		}
 
 		function unregisterAll() {
-			unregister("CommandOrControl+Alt+Space");
+			unregister("Command+Control+Alt+Tab");
 		}
 
 		registerShortcuts();
