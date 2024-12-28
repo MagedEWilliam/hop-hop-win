@@ -1,6 +1,11 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 use tauri_plugin_autostart::MacosLauncher;
+use tauri::State;
+use std::sync::Mutex;
+struct WindowState {
+    is_visible: Mutex<bool>,
+}
 
 #[tauri::command]
 fn move_mouse(x: i32, y: i32, abs: bool) -> Result<(), String> {
@@ -39,20 +44,35 @@ fn mouse_click() -> Result<(), String> {
 }
 
 #[tauri::command]
-fn hide_window(window: tauri::Window) {
-    if let Err(e) = window.hide() {
-        eprintln!("Failed to hide window: {:?}", e);
+fn show_window(window: tauri::Window, state: State<WindowState>) -> Result<(), String> {
+    let mut is_visible = state.is_visible.lock().unwrap();
+    if !*is_visible {
+        if let Err(e) = window.show() {
+            return Err(format!("Failed to show window: {:?}", e));
+        }
+        if let Err(e) = window.set_focus() {
+            eprintln!("Failed to focus window: {:?}", e);
+        }
+        *is_visible = true;
     }
+    Ok(())
 }
 
 #[tauri::command]
-fn show_window(window: tauri::Window) {
-    if let Err(e) = window.show() {
-        eprintln!("Failed to show window: {:?}", e);
+fn hide_window(window: tauri::Window, state: State<WindowState>) -> Result<(), String> {
+    let mut is_visible = state.is_visible.lock().unwrap();
+    if *is_visible {
+        if let Err(e) = window.hide() {
+            return Err(format!("Failed to hide window: {:?}", e));
+        }
+        *is_visible = false;
     }
-    if let Err(e) = window.set_focus() {
-        eprintln!("Failed to focus window: {:?}", e);
-    }
+    Ok(())
+}
+
+#[tauri::command]
+fn is_window_hidden(state: State<WindowState>) -> bool {
+    !*state.is_visible.lock().unwrap()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -61,9 +81,13 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"]) /* arbitrary number of args to pass to your app */))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .manage(WindowState {
+            is_visible: Mutex::new(true), // Assume the window starts as visible.
+        })
         .invoke_handler(tauri::generate_handler![
             show_window,
             hide_window,
+            is_window_hidden,
             move_mouse,
             mouse_click
         ])
