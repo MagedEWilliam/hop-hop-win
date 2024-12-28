@@ -207,6 +207,7 @@ function Cells() {
 								renderSubgrid(pair[0])
 							) : (
 								<>
+									<div className="bullseye"></div>
 									<p>{pair[0]}</p>
 									<p>{pair[1]}</p>
 								</>
