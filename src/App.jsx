@@ -41,10 +41,11 @@ async function move_mouse(x = 0, y = 0, abs = true) {
 
 async function hideWindow() {
 	try {
-		await invoke("hide_window");
+		return await invoke("hide_window");
 	} catch (e) {
 		console.log(e);
 	}
+	// return;
 }
 
 function Cells() {
@@ -70,87 +71,75 @@ function Cells() {
 		hideWindow(); // Hides the app
 	};
 
+	const PerformCallbackOnCellOrSubcell = (
+		activeCell,
+		scaleFactor,
+		callback,
+	) => {
+		const activeCellBoundry = activeCell.getBoundingClientRect();
+		const activeCellCenterX =
+			(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
+		const activeCellCenterY =
+			(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
+
+		move_mouse(
+			Number.parseInt(activeCellCenterX),
+			Number.parseInt(activeCellCenterY),
+		);
+		resetHighlight(); // Reset highlights
+		hideWindow(); // Hide the app
+		setTimeout(() => {
+			callback();
+		}, 100);
+	};
+
+	const highlightedCellOrSubcell = (selectedSubcell, scaleFactor, callback) => {
+		const activeCell = document.querySelector(".active");
+		if (activeCell && !selectedSubcell) {
+			PerformCallbackOnCellOrSubcell(activeCell, scaleFactor, callback);
+		} else if (activeCell && selectedSubcell) {
+			const activeSubCell = document.querySelector(".active .active-subcell");
+			PerformCallbackOnCellOrSubcell(activeSubCell, scaleFactor, callback);
+		}
+	};
 	const handleKeyDown = async (event) => {
 		const key = event.key.toUpperCase();
 		console.log(key);
 		const scaleFactor = window.devicePixelRatio;
 
 		if (key === "BACKSPACE") {
-			if (secondLetter) {
-				setSecondLetter(null); // Clear the second letter
-			} else if (firstLetter) {
+			// If the key is backspace, step back one letter
+			if (firstLetter && !secondLetter && !selectedSubcell) {
 				setFirstLetter(null); // Clear the first letter
-			} else if (firstLetter === null && secondLetter === null) {
+			} else if (firstLetter && secondLetter && !selectedSubcell) {
+				setSecondLetter(null); // Clear the second letter
+			} else if (firstLetter && secondLetter && selectedSubcell) {
+				setSelectedSubcell(null); // Clear the selected subcell
+			} else if (
+				firstLetter === null &&
+				secondLetter === null &&
+				selectedSubcell === null
+			) {
 				resetHighlight(); // Reset highlights
 				hideWindow(); // Hide the app if no letters are set
-			} else if (selectedSubcell) {
-				setSelectedSubcell(null); // Clear the selected subcell
 			}
 		} else if (key === " " || key === "ENTER") {
+			// Perform the click action if the key is space or enter
+			highlightedCellOrSubcell(selectedSubcell, scaleFactor, mouse_click);
 			// Perform the click action
-			const activeCell = document.querySelector(".active");
-			if (activeCell && !selectedSubcell) {
-				const activeCellBoundry = activeCell.getBoundingClientRect();
-				const activeCellCenterX =
-					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
-				const activeCellCenterY =
-					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
-
-				move_mouse(
-					Number.parseInt(activeCellCenterX),
-					Number.parseInt(activeCellCenterY),
-				);
-				resetHighlight(); // Reset highlights
-				hideWindow(); // Hide the app
-				setTimeout(() => {
-					mouse_click(); // Trigger mouse click
-				}, 100);
-			} else if (activeCell && selectedSubcell) {
-				const activeSubCell = document.querySelector(".active-subcell");
-				const activeCellBoundry = activeSubCell.getBoundingClientRect();
-				const activeCellCenterX =
-					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
-				const activeCellCenterY =
-					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
-
-				move_mouse(
-					Number.parseInt(activeCellCenterX),
-					Number.parseInt(activeCellCenterY),
-				);
-				resetHighlight(); // Reset highlights
-				hideWindow(); // Hide the app
-				setTimeout(() => {
-					mouse_click(); // Trigger mouse click
-				}, 100);
-			}
 		} else if (key === "ESCAPE") {
-			await invoke("hide_window");
+			await hideWindow();
 			resetHighlight(); // Reset highlights
 		} else if (key === "TAB") {
-			const activeCell = document.querySelector(".active");
-			if (activeCell) {
-				const activeCellBoundry = activeCell.getBoundingClientRect();
-				const activeCellCenterX =
-					(activeCellBoundry.left + activeCellBoundry.width / 2) * scaleFactor;
-				const activeCellCenterY =
-					(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
-
-				move_mouse(
-					Number.parseInt(activeCellCenterX),
-					Number.parseInt(activeCellCenterY),
-				);
-				hideWindow(); // Hide the app
-				setTimeout(() => {
-					resetHighlight(); // Reset highlights
-				}, 100);
-			}
+			highlightedCellOrSubcell(selectedSubcell, scaleFactor, resetHighlight);
 		} else if (alphabet.includes(key)) {
+			// If the key is a letter
 			if (!firstLetter) {
 				setFirstLetter(key); // Set the first letter
 			} else if (!secondLetter) {
 				setSecondLetter(key); // Set the second letter
 			} else if (!selectedSubcell) {
-				setSelectedSubcell(key);
+				setSelectedSubcell(key); // Set the selected subcell
 			}
 		}
 	};
@@ -164,25 +153,23 @@ function Cells() {
 		};
 	}, [firstLetter, secondLetter, selectedSubcell]);
 
-	const renderSubgrid = (cell) => (
+	const RenderSubgrid = ({ isCellHighlighted }) => (
 		<div className="subgrid">
-			{["w", "f", "p", "s", "r", "t", "x", "c", "d"].map((_, idx) => (
+			{"qwfpasrtzxcd".split("").map((_, idx) => (
 				<div
 					key={idx}
 					className={`subcell ${selectedSubcell === _.toUpperCase() ? "active-subcell" : ""}`}
-					onClick={() => setSelectedSubcell(idx)}
 				>
-					{_.toUpperCase()}
+					<div className={`${isCellHighlighted ? "" : "hidden"}`}>
+						{_.toUpperCase()}
+					</div>
 				</div>
 			))}
 		</div>
 	);
 
 	return (
-		<div
-			className="grid-container"
-			onClick={() => resetHighlight()} // Clicking anywhere resets highlights
-		>
+		<div className="grid-container">
 			{letterPairs.map((pair, index) => {
 				const isRowHighlighted = firstLetter === pair[0];
 				const isCellHighlighted =
@@ -203,15 +190,15 @@ function Cells() {
 						}`}
 					>
 						<div className="cordinates">
-							{isCellHighlighted ? (
-								renderSubgrid(pair[0])
-							) : (
-								<>
-									<div className="bullseye"></div>
-									<p>{pair[0]}</p>
-									<p>{pair[1]}</p>
-								</>
-							)}
+							<>
+								<RenderSubgrid isCellHighlighted={isCellHighlighted} />
+								{!isCellHighlighted ? (
+									<>
+										<p>{pair[0]}</p>
+										<p>{pair[1]}</p>
+									</>
+								) : null}
+							</>
 						</div>
 					</div>
 				);
@@ -258,8 +245,10 @@ function App() {
 				console.log("Shortcut triggered", await invoke("is_window_hidden"));
 				if (await invoke("is_window_hidden")) {
 					await invoke("show_window");
+					mouse_click();
+					window.focus();
 				} else {
-					await invoke("hide_window");
+					await hideWindow();
 				}
 			});
 		}
@@ -270,13 +259,61 @@ function App() {
 
 		registerShortcuts();
 
+		let ctrlTimeout;
+		let isCtrlHeld = false;
+
+		function _handleKeyDown(event) {
+			if (event.key === "Command+Control+Alt+Tab") {
+				isCtrlHeld = true;
+
+				// Start a timer to detect if it's a tap or a hold
+				ctrlTimeout = setTimeout(() => {
+					// If Ctrl is still held after 300ms, ignore it
+					isCtrlHeld = false;
+				}, 200);
+			}
+		}
+
+		function handleKeyUp(event) {
+			if (event.key === "Command+Control+Alt+Tab") {
+				clearTimeout(ctrlTimeout); // Cancel the hold detection timer
+
+				if (isCtrlHeld) {
+					// If released within the tap window, show the app
+					isCtrlHeld = false;
+					showWindow(); // show the app
+				}
+			}
+		}
+
+		// Attach the event listeners
+		window.addEventListener("keydown", _handleKeyDown);
+		window.addEventListener("keyup", handleKeyUp);
+
+		async function showWindow() {
+			console.log("App triggered by Alt tap!");
+			// Add your logic to bring the app to focus
+			if (await invoke("is_window_hidden")) {
+				await invoke("show_window");
+			} else {
+				await hideWindow();
+			}
+		}
+
 		return () => {
 			unregisterAll();
+			window.removeEventListener("keydown", _handleKeyDown);
+			window.removeEventListener("keyup", handleKeyUp);
 		};
 	}, []);
 
 	return (
-		<div className="container">
+		<div
+			className="container"
+			// onClick={() => {
+			// 	hideWindow();
+			// }}
+		>
 			<Cells monitorSize={screenSize} />
 		</div>
 	);

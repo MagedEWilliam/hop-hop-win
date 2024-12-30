@@ -17,7 +17,7 @@ body {
 	align-items: center;
 	overflow: hidden;
 	user-select: none;
-	opacity: 0.8;
+	opacity: 0.9;
 	font-family: sans-serif;
 }
 
@@ -30,6 +30,7 @@ body {
 p {
 	font-size: 1.1rem;
 	color: white;
+	mix-blend-mode: difference;
 	margin: 0px;
 }
 
@@ -62,10 +63,6 @@ p {
 	align-items: center;
 }
 
-.active {
-	/* background-color: rgba(0, 255, 0, 0.2); Highlight for the cell */
-}
-
 .grid-item .bullseye {
 	position: absolute;
 	top: 0px;
@@ -83,7 +80,7 @@ p {
 	top: 0;
 	left: 0;
 	display: grid;
-	grid-template-columns: repeat(3, 33%);
+	grid-template-columns: repeat(4, 25%);
 	grid-template-rows: repeat(3, 33%);
 	/* background: rgba(255, 255, 255, 0.9); */
 	border: 1px solid #ccc;
@@ -102,6 +99,10 @@ p {
 	color: white;
 }
 
-.subcell.active-subcell {
+.active .subcell.active-subcell {
 	background-color: rgba(0, 255, 0, 0.2);
+}
+
+.hidden {
+	visibility: hidden;
 }
