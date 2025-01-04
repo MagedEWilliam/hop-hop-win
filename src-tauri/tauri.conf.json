@@ -15,7 +15,7 @@
 				"hiddenTitle": true,
 				"title": "tauri-app",
 				"transparent": true,
-				"skipTaskbar": false,
+				"skipTaskbar": true,
 				"alwaysOnTop": true
 			}
 		],
