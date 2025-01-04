@@ -251,11 +251,13 @@ export const machine = createMachine(
 				mouse_click();
 			},
 			moveAndClickMouseAction: ({ context, event }) => {
-				const activeCell = document.querySelector(".active");
-				const activeSubCell = document.querySelector(".active .active-subcell");
 				if (context.secondLetter && !context.subCell) {
+					const activeCell = document.querySelector(".active");
 					PerformCallbackOnCellOrSubcell(activeCell, mouse_click);
 				} else if (context.subCell) {
+					const activeSubCell = document.querySelector(
+						".active .active-subcell",
+					);
 					PerformCallbackOnCellOrSubcell(activeSubCell, mouse_click);
 				}
 				console.log("moveAndClickMouseAction", context, event);

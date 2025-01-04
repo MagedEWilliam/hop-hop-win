@@ -8,7 +8,7 @@ import Cells from "./Cells";
 import { invoke } from "@tauri-apps/api/core";
 
 async function setFullscreen() {
-	// await getCurrentWindow().setFullscreen(true);
+	await getCurrentWindow().setFullscreen(true);
 	console.log("setFullscreen");
 }
 
