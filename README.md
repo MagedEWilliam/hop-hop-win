@@ -36,13 +36,13 @@ I use a split keyboard with a built-in mouse emulator, so this project differs s
 ## Roadmap
 Here’s a plan for the project’s future development:
 
-- Implement a system tray.
-- Add a settings page.
-- Expand or customize cell grids beyond the current 3x4 layout.
-- Mirror subcell mapping for consistency.
-- Support for double/triple clicks (within 300ms).
-- Enable arrow navigation for one-handed use.
-- Add automated tests to ensure reliability.
-- ~~Add a right-click option~~ (or pass through the action).
-- ~~Consider click-drag-release~~ (likely to skip).
-- ~~Refactor code using a finite state machine (FSM).~~
+☐ Implement a system tray.
+☐ Add a settings page.
+☐ Expand or customize cell grids beyond the current 3x4 layout.
+☐ Mirror subcell mapping for consistency.
+☐ Support for double/triple clicks (within 300ms).
+☐ Enable arrow navigation for one-handed use.
+☐ Add automated tests to ensure reliability.
+❎ ~~Add a right-click option~~ (or pass through the action).
+❎ ~~Consider click-drag-release~~ (likely to skip).
+✅ ~~Refactor code using a finite state machine (FSM).~~
