@@ -43,9 +43,15 @@ function Cells({ firstLetter, secondLetter, subCell }) {
 		const isRowHighlighted = firstLetter === pair[0];
 		const isCellHighlighted =
 			firstLetter === pair[0] && secondLetter === pair[1];
-		if (isCellHighlighted) return "grid-item active";
-		if (isRowHighlighted) return "grid-item highlighted";
-		if (firstLetter && !isRowHighlighted) return "grid-item unfocused";
+
+		if (firstLetter && !secondLetter) {
+			return isRowHighlighted ? "grid-item highlighted" : "grid-item unfocused";
+		}
+
+		if (firstLetter && secondLetter) {
+			return isCellHighlighted ? "grid-item active" : "grid-item unfocused";
+		}
+
 		return "grid-item";
 	};
 
