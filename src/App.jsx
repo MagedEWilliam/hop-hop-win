@@ -60,7 +60,9 @@ function App() {
 				state.context.secondLetter &&
 				!state.context.subCell
 			) {
-				send({ type: "[wfpsrtxcd] pressed", value: key });
+				if ("wfpsrtxcd".toUpperCase().includes(key)) {
+					send({ type: "[wfpsrtxcd] pressed", value: key });
+				}
 			}
 		}
 	};

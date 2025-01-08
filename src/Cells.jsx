@@ -44,7 +44,7 @@ function Cells({ firstLetter, secondLetter, subCell }) {
 		const isCellHighlighted =
 			firstLetter === pair[0] && secondLetter === pair[1];
 
-		if (firstLetter && !secondLetter) {
+		if (firstLetter && !secondLetter && !subCell) {
 			return isRowHighlighted ? "grid-item highlighted" : "grid-item unfocused";
 		}
 
