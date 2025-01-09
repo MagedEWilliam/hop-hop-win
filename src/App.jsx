@@ -9,6 +9,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 async function setFullscreen() {
 	await getCurrentWindow().setFullscreen(true);
+	// invoke("toggle_click_through", { enable: true });
 	console.log("setFullscreen");
 }
 

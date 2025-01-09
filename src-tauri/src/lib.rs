@@ -75,6 +75,11 @@ fn is_window_hidden(state: State<WindowState>) -> bool {
     !*state.is_visible.lock().unwrap()
 }
 
+#[tauri::command]
+fn toggle_click_through(window: tauri::Window, enable: bool) {
+    window.set_ignore_cursor_events(enable).unwrap();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -85,6 +90,7 @@ pub fn run() {
             is_visible: Mutex::new(true), // Assume the window starts as visible.
         })
         .invoke_handler(tauri::generate_handler![
+            toggle_click_through,
             show_window,
             hide_window,
             is_window_hidden,
