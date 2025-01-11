@@ -5,9 +5,17 @@ import { useMemo } from "preact/hooks";
 const generateLetterPairs = () => {
 	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	const pairs = [];
-	for (let i = 0; i < alphabet.length; i++) {
-		for (let j = 0; j < alphabet.length; j++) {
-			pairs.push(alphabet[i] + alphabet[j]);
+	for (
+		let firstLetterIndex = 0;
+		firstLetterIndex < alphabet.length;
+		firstLetterIndex++
+	) {
+		for (
+			let secondLetterIndex = 0;
+			secondLetterIndex < alphabet.length;
+			secondLetterIndex++
+		) {
+			pairs.push(alphabet[firstLetterIndex] + alphabet[secondLetterIndex]);
 		}
 	}
 	return pairs;

@@ -38,6 +38,15 @@ function App() {
 		if (key === "ESCAPE") {
 			send({ type: "ESC/shortcut triggered" });
 		} else if (key === "BACKSPACE") {
+			if (
+				!state.context.firstLetter &&
+				!state.context.secondLetter &&
+				!state.context.subCell
+			) {
+				send({ type: "ESC/shortcut triggered" });
+			} else {
+				send({ type: "backspace pressed" });
+			}
 			send({ type: "backspace pressed" });
 		} else if (key === "ENTER" || key === "SPACE") {
 			send({ type: "enter/space pressed", value: key });
