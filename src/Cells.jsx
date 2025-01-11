@@ -24,7 +24,7 @@ const RenderSubgrid = ({ isCellHighlighted, subCell }) => {
 				return (
 					<div
 						key={upperLetter}
-						className={`subcell ${subCell === upperLetter ? "active-subcell" : ""}`}
+						className={`subcell ${subCell === upperLetter ? "active-subcell" : "opacity-50"}`}
 					>
 						<div className={`${isCellHighlighted ? "" : "hidden"}`}>
 							{upperLetter}
@@ -70,7 +70,7 @@ function Cells({ firstLetter, secondLetter, subCell }) {
 						/>
 						{!(firstLetter === pair[0] && secondLetter === pair[1]) && (
 							<>
-								<p>{pair[0]}</p>
+								<p className={firstLetter ? "opacity-50" : ""}>{pair[0]}</p>
 								<p>{pair[1]}</p>
 							</>
 						)}
