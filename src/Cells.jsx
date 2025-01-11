@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import { signal } from "@preact/signals";
+import { useMemo } from "preact/hooks";
 
 // Helper function to generate letter pairs
 const generateLetterPairs = () => {
@@ -12,12 +13,13 @@ const generateLetterPairs = () => {
 	return pairs;
 };
 
-// Memoized subgrid component to avoid unnecessary re-renders
-const RenderSubgrid = React.memo(({ isCellHighlighted, subCell }) => {
-	const subgridLetters = "qwfpasrtzxcd".split("");
+// Subgrid component using signals
+const RenderSubgrid = ({ isCellHighlighted, subCell }) => {
+	const subgridLetters = signal("qwfpasrtzxcd".split(""));
+
 	return (
 		<div className="subgrid">
-			{subgridLetters.map((letter) => {
+			{subgridLetters.value.map((letter) => {
 				const upperLetter = letter.toUpperCase();
 				return (
 					<div
@@ -32,7 +34,7 @@ const RenderSubgrid = React.memo(({ isCellHighlighted, subCell }) => {
 			})}
 		</div>
 	);
-});
+};
 
 function Cells({ firstLetter, secondLetter, subCell }) {
 	// Memoize letter pairs to avoid recalculating on every render

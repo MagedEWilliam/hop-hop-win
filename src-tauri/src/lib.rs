@@ -1,8 +1,8 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
-use tauri_plugin_autostart::MacosLauncher;
-use tauri::State;
 use std::sync::Mutex;
+use tauri::State;
+use tauri_plugin_autostart::MacosLauncher;
 struct WindowState {
     is_visible: Mutex<bool>,
 }
@@ -83,7 +83,10 @@ fn toggle_click_through(window: tauri::Window, enable: bool) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1", "--flag2"]) /* arbitrary number of args to pass to your app */))
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--flag1", "--flag2"]), /* arbitrary number of args to pass to your app */
+        ))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .manage(WindowState {
