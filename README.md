@@ -19,7 +19,7 @@ Press `Command` + `Control` + `Alt` + `Tab` (or assign this combination to a sin
 Type any letter from "A" to "Z" to choose a row.
 
 3. Select a cell
-Type another letter (again, "A" to "Z") to choose a cell within the selected row.
+Type another letter (again, "A" to "Z") to choose a cell within the selected row. (notice the mouse moved to the center of the cell)
 
 4. Take an action
    * **Backspace**: Go back to selecting a row.
@@ -28,7 +28,7 @@ Type another letter (again, "A" to "Z") to choose a cell within the selected row
    * **ESC/Mouse Left Click**: Dismiss the interface.
   
 6. Refine with subcells
-If precision is needed, choose a subcell from a 4x3 grid. Each subcell is labeled with a letter. After selecting a subcell, the same actions as above are available.
+If precision is needed, choose a subcell from a 4x3 grid. Each subcell is labeled with a letter. After selecting a subcell (notice the mouse moved to the center of the subcell), the same actions as above are available.
 
 ## Motivation
 I use a split keyboard with a built-in mouse emulator, so this project differs slightly from tools like mouseless or warpd. Some functionality—such as mouse movement—is already integrated into my keyboard setup.
