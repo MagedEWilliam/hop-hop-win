@@ -98,9 +98,9 @@ p {
 	color: white;
 }
 
-.active .subcell.active-subcell {
+/* .active .subcell.active-subcell {
 	background-color: rgba(0, 255, 0, 0.2);
-}
+} */
 
 .hidden {
 	visibility: hidden;

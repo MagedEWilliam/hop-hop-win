@@ -16,7 +16,7 @@ async function move_mouse(x = 0, y = 0, abs = true) {
 	}
 }
 
-const PerformCallbackOnCellOrSubcell = (activeCell, callback = null) => {
+const moveCursorToCellCenter = (activeCell, callback = null) => {
 	const scaleFactor = window.devicePixelRatio;
 	const activeCellBoundry = activeCell.getBoundingClientRect();
 	const activeCellCenterX =
@@ -35,4 +35,4 @@ const PerformCallbackOnCellOrSubcell = (activeCell, callback = null) => {
 	}
 };
 
-export { mouse_click, move_mouse, PerformCallbackOnCellOrSubcell };
+export { mouse_click, move_mouse, moveCursorToCellCenter };

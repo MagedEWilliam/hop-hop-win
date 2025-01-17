@@ -1,6 +1,6 @@
 import { createMachine } from "xstate";
 import { invoke } from "@tauri-apps/api/core";
-import { mouse_click, PerformCallbackOnCellOrSubcell } from "./functions";
+import { mouse_click, move_mouse, moveCursorToCellCenter } from "./functions";
 
 export const machine = createMachine(
 	{
@@ -223,15 +223,29 @@ export const machine = createMachine(
 			},
 			setSecondLetter: ({ context, event }) => {
 				context.secondLetter = event.value;
+				setTimeout(() => {
+					const activeCell = document.querySelector(".active");
+					moveCursorToCellCenter(activeCell);
+				}, 1);
 			},
 			clearSecondLetter: ({ context }) => {
 				context.secondLetter = null;
 			},
 			setSubCell: ({ context, event }) => {
 				context.subCell = event.value;
+				setTimeout(() => {
+					const activeSubCell = document.querySelector(
+						".active .active-subcell",
+					);
+					moveCursorToCellCenter(activeSubCell);
+				}, 1);
 			},
 			clearSubCell: ({ context }) => {
 				context.subCell = null;
+				setTimeout(() => {
+					const activeCell = document.querySelector(".active");
+					moveCursorToCellCenter(activeCell);
+				}, 1);
 			},
 			resetMachine: async ({ context }) => {
 				context.firstLetter = null;
@@ -253,12 +267,12 @@ export const machine = createMachine(
 			moveAndClickMouseAction: ({ context, event }) => {
 				if (context.secondLetter && !context.subCell) {
 					const activeCell = document.querySelector(".active");
-					PerformCallbackOnCellOrSubcell(activeCell, mouse_click);
+					moveCursorToCellCenter(activeCell, mouse_click);
 				} else if (context.subCell) {
 					const activeSubCell = document.querySelector(
 						".active .active-subcell",
 					);
-					PerformCallbackOnCellOrSubcell(activeSubCell, mouse_click);
+					moveCursorToCellCenter(activeSubCell, mouse_click);
 				}
 				console.log("moveAndClickMouseAction", context, event);
 			},
@@ -266,9 +280,9 @@ export const machine = createMachine(
 				const activeCell = document.querySelector(".active");
 				const activeSubCell = document.querySelector(".active .active-subcell");
 				if (context.secondLetter && !context.subCell) {
-					PerformCallbackOnCellOrSubcell(activeCell);
+					moveCursorToCellCenter(activeCell);
 				} else if (context.subCell) {
-					PerformCallbackOnCellOrSubcell(activeSubCell);
+					moveCursorToCellCenter(activeSubCell);
 				}
 				console.log("moveMouseAction", context, event);
 			},

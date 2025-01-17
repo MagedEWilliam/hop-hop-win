@@ -47,7 +47,6 @@ function App() {
 			} else {
 				send({ type: "backspace pressed" });
 			}
-			send({ type: "backspace pressed" });
 		} else if (key === "ENTER" || key === "SPACE") {
 			send({ type: "enter/space pressed", value: key });
 		} else if (key === "TAB") {
