@@ -16,7 +16,7 @@ async function setFullscreen() {
 setFullscreen();
 
 async function registerShortcuts(send) {
-	await register("Command+Control+Alt+Tab", async () => {
+	await register("Command+Alt+c", async () => {
 		if (await invoke("is_window_hidden")) {
 			send({ type: "shortcut triggered" });
 		} else {
@@ -26,7 +26,7 @@ async function registerShortcuts(send) {
 }
 
 function unregisterAll() {
-	unregister("Command+Control+Alt+Tab");
+	unregister("Command+Alt+c");
 }
 
 function App() {

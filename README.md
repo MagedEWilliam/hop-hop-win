@@ -13,7 +13,7 @@ This project belongs to the second camp—a software-focused approach to minimiz
 
 ## How to Use
 1. Trigger the interface
-Press `Command` + `Control` + `Alt` + `Tab` (or assign this combination to a single key). This is a limitation of the [tauri-plugin-global-shortcut](https://github.com/tauri-apps/tauri-plugin-global-shortcut), but I plan to request a feature for single-modifier triggers.
+Press `Command/GUI` + `Alt` + `X` (or assign this combination to a single key). This is a limitation of the [tauri-plugin-global-shortcut](https://github.com/tauri-apps/tauri-plugin-global-shortcut), but I plan to request a feature for single-modifier triggers. 
 
 2. Select a row
 Type any letter from "A" to "Z" to choose a row.
