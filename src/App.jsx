@@ -64,11 +64,7 @@ function App() {
 				!state.context.subCell
 			) {
 				send({ type: "[A-Z] pressed", value: key });
-			} else if (
-				state.context.firstLetter &&
-				state.context.secondLetter &&
-				!state.context.subCell
-			) {
+			} else if (state.context.firstLetter && state.context.secondLetter) {
 				if ("qwfpasrtzxcd".toUpperCase().includes(key)) {
 					send({ type: "[wfpsrtxcd] pressed", value: key });
 				}

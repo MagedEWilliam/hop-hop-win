@@ -146,8 +146,24 @@ export const machine = createMachine(
 					],
 				},
 			},
+			transite: {
+				always: {
+					target: "subCellSelected",
+					actions: [],
+				},
+			},
 			subCellSelected: {
 				on: {
+					"[wfpsrtxcd] pressed": [
+						{
+							target: "transite",
+							actions: [
+								{
+									type: "setSubCell",
+								},
+							],
+						},
+					],
 					"enter/space pressed": [
 						{
 							target: "moveAndClickMouse",

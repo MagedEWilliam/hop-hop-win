@@ -7,7 +7,7 @@
 
 ## What is this?
 Switching between the keyboard and mouse disrupts workflow. While exploring solutions, I found two main approaches:
-- Hardware-based: Devices like trackballs, trackpoints, and trackpads.
+- Hardware-based: Devices like trackballs, trackpoints, and trackpads, even the keyboard itself emulating mouse movement.
 - Software-based: Solutions like this project aim to address the problem programmatically.
 This project belongs to the second camp—a software-focused approach to minimizing interruptions.
 
