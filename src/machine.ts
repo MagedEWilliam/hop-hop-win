@@ -1,6 +1,7 @@
 import { createMachine } from "xstate";
 import { invoke } from "@tauri-apps/api/core";
-import { mouse_click, move_mouse, moveCursorToCellCenter } from "./functions";
+import { mouse_click, moveCursorToCellCenter } from "./functions";
+import type { ElementWithBoundingRect } from "./types/commonType";
 
 export const machine = createMachine(
 	{
@@ -241,6 +242,7 @@ export const machine = createMachine(
 				context.secondLetter = event.value;
 				setTimeout(() => {
 					const activeCell = document.querySelector(".active");
+					if (!activeCell) return;
 					moveCursorToCellCenter(activeCell);
 				}, 1);
 			},
@@ -253,6 +255,7 @@ export const machine = createMachine(
 					const activeSubCell = document.querySelector(
 						".active .active-subcell",
 					);
+					if (!activeSubCell) return;
 					moveCursorToCellCenter(activeSubCell);
 				}, 1);
 			},
@@ -260,6 +263,7 @@ export const machine = createMachine(
 				context.subCell = null;
 				setTimeout(() => {
 					const activeCell = document.querySelector(".active");
+					if (!activeCell) return;
 					moveCursorToCellCenter(activeCell);
 				}, 1);
 			},
@@ -282,22 +286,26 @@ export const machine = createMachine(
 			},
 			moveAndClickMouseAction: ({ context, event }) => {
 				if (context.secondLetter && !context.subCell) {
-					const activeCell = document.querySelector(".active");
+					const activeCell: ElementWithBoundingRect | null =
+						document.querySelector(".active");
+					if (!activeCell) return;
 					moveCursorToCellCenter(activeCell, mouse_click);
 				} else if (context.subCell) {
-					const activeSubCell = document.querySelector(
-						".active .active-subcell",
-					);
+					const activeSubCell: ElementWithBoundingRect | null =
+						document.querySelector(".active .active-subcell");
+					if (!activeSubCell) return;
 					moveCursorToCellCenter(activeSubCell, mouse_click);
 				}
 				console.log("moveAndClickMouseAction", context, event);
 			},
 			moveMouseAction: ({ context, event }) => {
-				const activeCell = document.querySelector(".active");
-				const activeSubCell = document.querySelector(".active .active-subcell");
-				if (context.secondLetter && !context.subCell) {
+				const activeCell: ElementWithBoundingRect | null =
+					document.querySelector(".active");
+				const activeSubCell: ElementWithBoundingRect | null =
+					document.querySelector(".active .active-subcell");
+				if (context.secondLetter && !context.subCell && activeCell) {
 					moveCursorToCellCenter(activeCell);
-				} else if (context.subCell) {
+				} else if (context.subCell && activeSubCell) {
 					moveCursorToCellCenter(activeSubCell);
 				}
 				console.log("moveMouseAction", context, event);
