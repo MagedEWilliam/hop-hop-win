@@ -5,6 +5,8 @@
 > - [warpd](https://github.com/rvaiya/warpd)
 > - [mouseless](https://mouseless.click/)
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/magedwilliae)
+
 ## What is this?
 Switching between the keyboard and mouse disrupts workflow. While exploring solutions, I found two main approaches:
 - Hardware-based: Devices like trackballs, trackpoints, and trackpads, even the keyboard itself emulating mouse movement.
