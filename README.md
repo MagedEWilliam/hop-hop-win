@@ -5,7 +5,7 @@
 > - [warpd](https://github.com/rvaiya/warpd)
 > - [mouseless](https://mouseless.click/)
 
-[!["Buy Me A Coffee"](https://raw.githubusercontent.com/MagedEWilliam/hop-hop-win/refs/heads/main/bmc_qr.png)](https://www.buymeacoffee.com/gbraad)
+[!["Buy Me A Coffee"](https://raw.githubusercontent.com/MagedEWilliam/hop-hop-win/refs/heads/main/bmc_qr.png)](https://buymeacoffee.com/magedwilliam)
 
 ## What is this?
 Switching between the keyboard and mouse disrupts workflow. While exploring solutions, I found two main approaches:
