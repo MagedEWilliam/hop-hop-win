@@ -33,7 +33,7 @@ const moveCursorToCellCenter = (
 	const activeCellCenterY: number =
 		(activeCellBoundry.top + activeCellBoundry.height / 2) * scaleFactor;
 
-	move_mouse(Number(activeCellCenterX), Number(activeCellCenterY));
+	move_mouse(Math.ceil(activeCellCenterX), Math.ceil(activeCellCenterY));
 	if (callback) {
 		setTimeout(() => {
 			callback();
